@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'slimmermeten'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -47,9 +48,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'slimmemeterproject.urls'
+ROOT_URLCONF = 'slimmermeten.urls'
 
-WSGI_APPLICATION = 'slimmemeterproject.wsgi.application'
+WSGI_APPLICATION = 'slimmermeten.wsgi.application'
 
 
 # Database
