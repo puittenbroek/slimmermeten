@@ -96,6 +96,13 @@ class Command(BaseCommand):
         # But for first version, only rows are adjustable.
         p1_teller = 0
         next_is_gas = False
+
+        # Early exit.
+        if not (self.record_electricity_reading or self.record_power_consumption or self.record_gas_reading):
+            printt("Not time to record anything.. exiting")
+            ser.close()
+            return
+
         while p1_teller < rows:
             p1_line=''
             #Read 1 line
@@ -167,5 +174,5 @@ class Command(BaseCommand):
             power_consumption.save()
             printt("- Saved power consumption")
 
-
+        ser.close()
         printt("Done")
