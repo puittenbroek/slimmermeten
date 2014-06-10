@@ -22,6 +22,7 @@ class Command(BaseCommand):
         last_elek_verbruik = PowerConsumption.objects.all().order_by('-date') 
         if last_elek_verbruik:
             last_date = last_elek_verbruik[0].date
+            self.stdout.write("record_power_consumption: %s " % last_date)
             delta_now = now - last_date
             if delta_now < one_minute_ago:
                 record = False
@@ -35,6 +36,7 @@ class Command(BaseCommand):
         last_elek_stand = ElektricityReading.objects.all().order_by('-date') 
         if last_elek_stand:
             last_date = last_elek_stand[0].date
+            self.stdout.write("record_electricity_reading: %s " % last_date)
             delta_now = now - last_date
             if delta_now < one_minute_ago:
                 record = False
@@ -48,6 +50,7 @@ class Command(BaseCommand):
         last_gas_stand = GasReading.objects.all().order_by('-date') 
         if last_gas_stand:
             last_date = last_gas_stand[0].date
+            self.stdout.write("record_gas_reading: %s " % last_date)
             delta_now = now - last_date
             if delta_now < one_hour_ago:
                 record = False
