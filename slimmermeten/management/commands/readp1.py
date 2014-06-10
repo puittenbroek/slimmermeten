@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from slimmermeten.models import ElektrischVerbruik, GasStand, ElektrischStand
+from slimmermeten.models import PowerConsumption, GasReading, ElektricityReading
 import sys
 import serial
 from datetime import datetime, timedelta
@@ -15,11 +15,11 @@ class Command(BaseCommand):
         )
 
     @property
-    def record_elek_verbruik(self):
+    def record_power_consumption(self):
         one_minute_ago = timedelta(seconds=60)
         now = datetime.now()   
         record = True   
-        last_elek_verbruik = ElektrischVerbruik.objects.all().order_by('-date') 
+        last_elek_verbruik = PowerConsumption.objects.all().order_by('-date') 
         if last_elek_verbruik:
             last_date = last_elek_verbruik[0].date
             delta_now = now - last_date
@@ -28,11 +28,11 @@ class Command(BaseCommand):
         return True
 
     @property 
-    def record_elek_stand(self):
+    def record_electricity_reading(self):
         one_minute_ago = timedelta(seconds=60)
         now = datetime.now()   
         record = True   
-        last_elek_stand = ElektrischStand.objects.all().order_by('-date') 
+        last_elek_stand = ElektricityReading.objects.all().order_by('-date') 
         if last_elek_stand:
             last_date = last_elek_stand[0].date
             delta_now = now - last_date
@@ -41,11 +41,11 @@ class Command(BaseCommand):
         return True
 
     @property 
-    def record_gas_stand(self):
+    def record_gas_reading(self):
         one_hour_ago =  timedelta(minutes=60)
         now = datetime.now()   
         record = True   
-        last_gas_stand = GasStand.objects.all().order_by('-date') 
+        last_gas_stand = GasReading.objects.all().order_by('-date') 
         if last_gas_stand:
             last_date = last_gas_stand[0].date
             delta_now = now - last_date
@@ -54,7 +54,9 @@ class Command(BaseCommand):
         return True
 
     def handle(self, *args, **options):
+        # Easy helper
         printt = self.stdout.write
+
         #Set COM port config
         ser = serial.Serial()
         ser.baudrate = 9600
@@ -71,64 +73,97 @@ class Command(BaseCommand):
 
         # Rows
         rows = int(options['output_rows'])
+
+        # Timy helpers
         one_minute_ago = timedelta(seconds=60)
         one_hour_ago =  timedelta(minutes=60)
         now = datetime.now()
 
-        printt("Gasstand: %s" % self.record_gas_stand)
-        printt("Elekstand: %s " % self.record_elek_stand)
-        printt("Elekverbruik: %s " % self.record_elek_verbruik)
+        # Gas reading
+        gas_reading = GasReading()
+        gas_reading.date =now
 
+        # Electrcity reading
+        electricity_reading = ElektricityReading()
+        electricity_reading.date = now
 
-        p1_teller=0
+        # Power consumption
+        power_consumption = PowerConsumption()
+        power_consumption.date = now
+
+        # We usually get 20 lines back from the serial
+        # This varies .. as do the identifier probably
+        # But for first version, only rows are adjustable.
+        p1_teller = 0
+        next_is_gas = False
         while p1_teller < rows:
             p1_line=''
             #Read 1 line
             p1_line=ser.readline().strip()
 
             # Dal of piek?
-            if p1_line[0:9] == "0-0:96.14":
-                waarde = int(p1_line[13:-1])
-                result['elektriciteit_tarief'] = waarde and 'dal' or 'piek'
-            #Meterstand Daltarief
+            if p1_line[0:9] == "0-0:96.14" and :
+                value = int(p1_line[13:-1])
+                electricity_reading.tarief = value
+
+            #Reading Low (T1) tarif
             elif p1_line[0:9] == "1-0:1.8.1":
-                result['elektriciteit_dal_stand'] = int(p1_line[10:15])
+                value = int(p1_line[10:15])
+                electricity_reading.t1_reading = value
 
-            #Meterstand Piektarief
+            #Reading High (T2) tarif
             elif p1_line[0:9] == "1-0:1.8.2":
-                result['elektriciteit_piek_stand'] = int(p1_line[10:15])
+                value = int(p1_line[10:15])
+                electricity_reading.t1_reading = value
 
-            # Daltarief, teruggeleverd vermogen 1-0:2.8.1
+            # Reading Low (T1) back to grid
             elif p1_line[0:9] == "1-0:2.8.1":
-                result['elektriciteit_dal_terug'] = int(p1_line[10:15])
+                value = int(p1_line[10:15])
+                electricity_reading.t1_back_reading = value
 
-            # Piek tarief, teruggeleverd vermogen 1-0:2.8.2
+            # Reading High (T2) back to grid
             elif p1_line[0:9] == "1-0:2.8.2":
-                result['elektriciteit_piek_terug'] = int(p1_line[10:15])
+                value = int(p1_line[10:15])
+                electricity_reading.t2_back_reading = value
 
-            # Huidige elektriciteitafname: 1-0:1.7.0
-            elif p1_line[0:9] == "1-0:1.7.0":
+            # Current power consumption
+            elif p1_line[0:9] == "1-0:1.7.0" and self.record_power_consumption:
                 watt_float = float(p1_line[10:17])*1000
                 watt_float = int(watt_float)
-                result['elektriciteit_huidig'] = watt_float
+                power_consumption.power = watt_float
 
-            # Huidig teruggeleverd vermogen: 1-0:1.7.0
-            elif p1_line[0:9] == "1-0:2.7.0":
+            # Current power delivery back to grid (negative consumption!)
+            elif p1_line[0:9] == "1-0:2.7.0" and self.record_power_consumption:
                 watt_float = float(p1_line[10:17])*1000
                 watt_float = int(watt_float)
-                result['elektriciteit_huidig_terug'] = watt_float
+                if watt_float > 0:
+                    power_consumption.power = watt_float
 
-            # Gasmeter: 0-1:24.3.0
+            # Gasmeter: 0-1:24.3.0. Is followed by the value.
+            # We set the flag.
             elif p1_line[0:10] == "0-1:24.3.0":
                 next_is_gas = True
-            elif next_is_gas:
+            elif next_is_gas and self.record_gas_reading:
                 gas_float = float(p1_line[1:10])*1000
                 gas_float = int(gas_float)
                 next_is_gas = False
-                result['gas_stand'] = gas_float
+                # result['gas_stand'] = gas_float
+                gas_reading.reading = gas_float
             p1_teller += 1   
-        # poll.opened = False
-        # poll.save()
-        # printt('last_elek_verbruik: "%s"' % last_elek_verbruik)
-        # printt('last_elek_stand: "%s"' % last_elek_stand)
-        # printt('last_gas_stand: "%s"' % last_gas_stand)
+
+        # Save gas
+        if self.record_gas_reading:
+            gas_reading.save()
+            printt("- Saved gas reading")
+
+        if self.record_electricity_reading:
+            electricity_reading.save()
+            printt("- Saved electricty reading")
+
+        # Save power consumption
+        if self.record_power_consumption:
+            power_consumption.save()
+            printt("- Saved power consumption")
+
+
+        printt("Done")

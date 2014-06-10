@@ -1,5 +1,5 @@
-- Make Managment Command work and insert date
+- Make Managment Command work and insert data
+- Cronjob!
   * Once per hour for Gas meter
   * Every minute for Elektricity Usage
   * Every 5 minutes for Elektricty meter
-- Translate models to English ..
