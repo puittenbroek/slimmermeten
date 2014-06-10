@@ -154,7 +154,7 @@ class Command(BaseCommand):
             # We set the flag.
             if p1_line[0:10] == "0-1:24.3.0":
                 next_is_gas = True
-            if next_is_gas and self.record_gas_reading:
+            elif next_is_gas and self.record_gas_reading:
                 gas_float = float(p1_line[1:10])*1000
                 gas_float = int(gas_float)
                 next_is_gas = False
