@@ -102,38 +102,38 @@ class Command(BaseCommand):
             p1_line=ser.readline().strip()
 
             # Dal of piek?
-            if p1_line[0:9] == "0-0:96.14" and :
+            if p1_line[0:9] == "0-0:96.14" and self.record_electricity_reading:
                 value = int(p1_line[13:-1])
                 electricity_reading.tarief = value
 
             #Reading Low (T1) tarif
-            elif p1_line[0:9] == "1-0:1.8.1":
+            if p1_line[0:9] == "1-0:1.8.1" and self.record_electricity_reading:
                 value = int(p1_line[10:15])
                 electricity_reading.t1_reading = value
 
             #Reading High (T2) tarif
-            elif p1_line[0:9] == "1-0:1.8.2":
+            if p1_line[0:9] == "1-0:1.8.2" and self.record_electricity_reading:
                 value = int(p1_line[10:15])
                 electricity_reading.t1_reading = value
 
             # Reading Low (T1) back to grid
-            elif p1_line[0:9] == "1-0:2.8.1":
+            if p1_line[0:9] == "1-0:2.8.1" and self.record_electricity_reading:
                 value = int(p1_line[10:15])
                 electricity_reading.t1_back_reading = value
 
             # Reading High (T2) back to grid
-            elif p1_line[0:9] == "1-0:2.8.2":
+            if p1_line[0:9] == "1-0:2.8.2" and self.record_electricity_reading:
                 value = int(p1_line[10:15])
                 electricity_reading.t2_back_reading = value
 
             # Current power consumption
-            elif p1_line[0:9] == "1-0:1.7.0" and self.record_power_consumption:
+            if p1_line[0:9] == "1-0:1.7.0" and self.record_power_consumption:
                 watt_float = float(p1_line[10:17])*1000
                 watt_float = int(watt_float)
                 power_consumption.power = watt_float
 
             # Current power delivery back to grid (negative consumption!)
-            elif p1_line[0:9] == "1-0:2.7.0" and self.record_power_consumption:
+            if p1_line[0:9] == "1-0:2.7.0" and self.record_power_consumption:
                 watt_float = float(p1_line[10:17])*1000
                 watt_float = int(watt_float)
                 if watt_float > 0:
@@ -141,14 +141,16 @@ class Command(BaseCommand):
 
             # Gasmeter: 0-1:24.3.0. Is followed by the value.
             # We set the flag.
-            elif p1_line[0:10] == "0-1:24.3.0":
+            if p1_line[0:10] == "0-1:24.3.0":
                 next_is_gas = True
-            elif next_is_gas and self.record_gas_reading:
+            if next_is_gas and self.record_gas_reading:
                 gas_float = float(p1_line[1:10])*1000
                 gas_float = int(gas_float)
                 next_is_gas = False
                 # result['gas_stand'] = gas_float
                 gas_reading.reading = gas_float
+
+            # Always up the counter
             p1_teller += 1   
 
         # Save gas
