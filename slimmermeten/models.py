@@ -1,6 +1,7 @@
 from django.db import models
 
 # Create your models here.
+
 class ElektrischStand(models.Model):
 	# Kan per 10 seconden, doen per minuut
 	date = models.DateTimeField('datum meting')
