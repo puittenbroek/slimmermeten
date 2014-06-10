@@ -1,0 +1,5 @@
+- Translate models to English ..
+- Make Managment Command work and insert date
+  * Once per hour for Gas meter
+  * Every minute for Elektricity Usage
+  * Every 5 minutes for Elektricty meter
