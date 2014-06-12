@@ -130,7 +130,7 @@ class Command(BaseCommand):
             #Reading High (T2) tarif
             if p1_line[0:9] == "1-0:1.8.2" and record_electricity_reading:
                 value = int(p1_line[10:15])
-                electricity_reading.t1_reading = value
+                electricity_reading.t2_reading = value
 
             # Reading Low (T1) back to grid
             if p1_line[0:9] == "1-0:2.8.1" and record_electricity_reading:
