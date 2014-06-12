@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'south',
     'slimmermeten'
 )
 
@@ -57,16 +58,16 @@ WSGI_APPLICATION = 'slimmermeten.wsgi.application'
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
 DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2', 
-            'NAME': 'slimmemeter',
-            'USER': 'uitlezer',
-            'PASSWORD': 'uitlezer',
-            'HOST': '10.0.0.31', 
-            'PORT': '',
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', 
+        'NAME': 'slimmemeter',
+        'USER': 'uitlezer',
+        'PASSWORD': 'uitlezer',
+        'HOST': '10.0.0.31', 
+        'PORT': '',
     }
-
+}
+TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
 
 # Internationalization
