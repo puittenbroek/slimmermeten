@@ -9,7 +9,7 @@ class ElektricityReading(models.Model):
 	t1_back_reading = models.IntegerField(default=0) #23:00-07:00
 
 	# T2 standen (normal + back to grid)
-	t2_stand = models.IntegerField(default=0) #07:00-23:00
+	t2_reading = models.IntegerField(default=0) #07:00-23:00
 	t2_back_reading = models.IntegerField(default=0) #07:00-23:00
 
 	tarief = models.IntegerField(default=0) #0 of 1 (T1 of T2)
