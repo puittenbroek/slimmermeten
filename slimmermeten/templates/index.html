@@ -3,10 +3,22 @@
 {% block css %}
 <script src="{% static "js/libs/Chart.min.js" %}">
 </script>
+<link rel="stylesheet" href="{% static "css/slimmermeten.css" %}" />
 {% endblock %}
 
 {% block content %}
 <canvas id="myChart" width="1024" height="960"></canvas>
+
+
+
+<div class='legenda'>
+    {% for date, values in days.items %}
+    <div class=''>
+        <span class='date'>{{date}}</span><span class='block' style='background: rgb{{colors|get_item:date}}'> </span>
+    </div>
+    {% endfor %}
+</div>
+
 {% endblock %}
 
 
@@ -17,8 +29,8 @@ var data = {
     datasets : [
     {% for date, values in days.items %}
         {
-            fillColor : "{{colors|get_item:date}}",
-            strokeColor : "rgba(220,220,220,1)",
+            fillColor : "rgb{{colors|get_item:date}}",
+            strokeColor : "rgb{{colors|get_item:date}}",
             pointColor : "rgba(220,220,220,1)",
             pointStrokeColor : "#fff",
             data : {{values}}
@@ -29,6 +41,7 @@ var data = {
 var ctx = $("#myChart").get(0).getContext("2d");
 options = {     
     scaleLabel : "<%=value%> Watt",
+        datasetFill : false,
 }
 
 new Chart(ctx).Line(data, options);

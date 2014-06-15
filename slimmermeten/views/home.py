@@ -41,14 +41,15 @@ def home(request):
 
 
     days[cur_date] = cur_row
-    print days
     hours = range(0,24)
     N = 150
     HSV_tuples = [(x*1.0/N, 0.5, 0.5) for x in range(N)]
     RGB_tuples = map(lambda x: (colorsys.hsv_to_rgb(*x) + (0.5, )), HSV_tuples)
+    # print RGB_tuples
+    pickers = "233-150-122,250-128-114,255-160-122,255-165-0,255-140-0,255-127-80,240-128-128,255-99-71,255-69-0,255-0-0".split(",")
     colors = {}
     for ind, day in enumerate(days.keys()):
-        colors[day] = RGB_tuples[ind]
+        colors[day] = "({})".format(pickers[ind].replace("-",","))
 
     context = {'days': days, 'day_order': day_order, 'hours': hours, 'colors':colors}
     return render(request, 'index.html', context)
