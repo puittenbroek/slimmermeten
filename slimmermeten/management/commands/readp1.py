@@ -4,7 +4,7 @@ import sys
 import serial
 from datetime import datetime, timedelta
 from optparse import make_option
-from django.utils.timezone import utc
+# from django.utils.timezone import utc
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
@@ -18,7 +18,7 @@ class Command(BaseCommand):
     @property
     def record_power_consumption(self):
         one_minute_ago = timedelta(seconds=60)
-        now = datetime.utcnow().replace(tzinfo=utc)
+        now = datetime.now()
         record = True   
         last_elek_verbruik = PowerConsumption.objects.all().order_by('-date') 
         if last_elek_verbruik:
@@ -32,7 +32,7 @@ class Command(BaseCommand):
     @property 
     def record_electricity_reading(self):
         one_minute_ago = timedelta(seconds=60)
-        now = datetime.utcnow().replace(tzinfo=utc)
+        now = datetime.now()
         record = True   
         last_elek_stand = ElektricityReading.objects.all().order_by('-date') 
         if last_elek_stand:
@@ -46,7 +46,7 @@ class Command(BaseCommand):
     @property 
     def record_gas_reading(self):
         one_hour_ago =  timedelta(minutes=60)
-        now = datetime.utcnow().replace(tzinfo=utc)
+        now = datetime.now()
         record = True   
         last_gas_stand = GasReading.objects.all().order_by('-date') 
         if last_gas_stand:
@@ -81,7 +81,7 @@ class Command(BaseCommand):
         # Timy helpers
         one_minute_ago = timedelta(seconds=60)
         one_hour_ago =  timedelta(minutes=60)
-        now = datetime.utcnow().replace(tzinfo=utc)
+        now = datetime.now()
 
         # Gas reading
         gas_reading = GasReading()

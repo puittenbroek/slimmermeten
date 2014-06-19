@@ -3,3 +3,6 @@
     width: 40px;
     display: inline-block;
 }
+.legenda {
+    float: right;
+}
