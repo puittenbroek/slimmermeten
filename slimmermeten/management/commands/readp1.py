@@ -4,7 +4,7 @@ import sys
 import serial
 from datetime import datetime, timedelta
 from optparse import make_option
-# from django.utils.timezone import utc
+from decimal import getcontext, setcontext, Decimal
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
@@ -121,22 +121,22 @@ class Command(BaseCommand):
 
             #Reading Low (T1) tarif
             if p1_line[0:9] == "1-0:1.8.1" and record_electricity_reading:
-                value = int(p1_line[10:15])
+                value = Decimal(p1_line[10:15])
                 electricity_reading.t1_reading = value
 
             #Reading High (T2) tarif
             if p1_line[0:9] == "1-0:1.8.2" and record_electricity_reading:
-                value = int(p1_line[10:15])
+                value = Decimal(p1_line[10:15])
                 electricity_reading.t2_reading = value
 
             # Reading Low (T1) back to grid
             if p1_line[0:9] == "1-0:2.8.1" and record_electricity_reading:
-                value = int(p1_line[10:15])
+                value = Decimal(p1_line[10:15])
                 electricity_reading.t1_back_reading = value
 
             # Reading High (T2) back to grid
             if p1_line[0:9] == "1-0:2.8.2" and record_electricity_reading:
-                value = int(p1_line[10:15])
+                value = Decimal(p1_line[10:15])
                 electricity_reading.t2_back_reading = value
 
             # Current power consumption
@@ -147,6 +147,7 @@ class Command(BaseCommand):
 
             # Current power delivery back to grid (negative consumption!)
             if p1_line[0:9] == "1-0:2.7.0" and record_power_consumption:
+                # 1000 W == 1 kW
                 watt_float = float(p1_line[10:17])*1000
                 watt_float = int(watt_float)
                 if watt_float > 0:
