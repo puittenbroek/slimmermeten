@@ -108,7 +108,8 @@ class Command(BaseCommand):
             printt("Not time to record anything.. exiting")
             ser.close()
             return
-
+        # Decimal precision
+        getcontext().prec = 3
         while p1_teller < rows:
             p1_line=''
             #Read 1 line
